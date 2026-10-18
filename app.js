@@ -1,8 +1,9 @@
 console.log("Hello world");
 
 function calculateTax(amount) {
-  return amount * 9999;
+  return amount * 0.20;
 }
+
 
 function getDiscount(){
   return -45;
