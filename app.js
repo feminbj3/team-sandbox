@@ -8,3 +8,7 @@ function calculateTax(amount) {
 function getDiscount(){
   return -45;
 }
+
+function getOS(){
+  return os;
+}
