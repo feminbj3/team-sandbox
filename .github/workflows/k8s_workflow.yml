@@ -1,0 +1,44 @@
+name: K8s on runner
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  k8s-lab:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up K8s
+        uses: helm/kind-action@v1.10.0
+      - name: Deploy a deployment in the cluster
+        run: |
+          kubectl create deployment credit-api --image=nginx:1.25-alpine --replicas=2
+          kubectl rollout status deployment/credit-api --timeout=60s
+      - name: Run a rollout
+        id: rollout_test
+        run: |
+          kubectl set image deployment/credit-api nginx=nginx:1.27-alpine
+          kubectl rollout status deployment/credit-api --timeout=45s
+          kubectl port-forward deploy/credit-api 8080:80 &
+          sleep 3
+          curl --fail --silent --retry 3 http://localhost:8080/ > /dev/null
+
+      - name: Automated SRE Self-Healing Rollback (Runs ONLY if Rollout/Smoke Fails!)
+        if: failure() && steps.rollout_test.conclusion == 'failure'
+        run: |
+          echo "::error::Smoke test failed! Triggering automated kubectl rollback..."
+          kubectl rollout undo deployment/credit-api
+          kubectl rollout status deployment/credit-api --timeout=60s
+          kubectl describe pods -l app=credit-api
+          exit 1 
