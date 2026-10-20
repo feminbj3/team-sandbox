@@ -30,4 +30,5 @@ jobs:
         with:
           name: coverage-report-${{ matrix.python-version }}
           path: coverage.xml
+          retention-days: 7
     
