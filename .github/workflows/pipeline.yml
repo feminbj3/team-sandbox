@@ -25,13 +25,13 @@ concurrency:
 jobs:
   verify-and-test:
     runs-on: ubuntu-latest
-    timeot-minutes: 10
+    timeout-minutes: 10
     steps:
-      -name: Checkout code
-       uses: actions/checkout@v3      
-      -name: Execute health and unit tests
-       env: 
-        APP_MODE: test
-       run: |
-        python3 -m unittest discover -s tests
-        echo "Commit SHA is ${{ github.sha }}"
+      - name: Checkout code
+        uses: actions/checkout@v3      
+      - name: Execute health and unit tests
+        env: 
+         APP_MODE: test
+        run: |
+         python3 -m unittest discover -s tests
+         echo "Commit SHA is ${{ github.sha }}"
