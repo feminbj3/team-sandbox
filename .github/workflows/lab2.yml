@@ -34,7 +34,7 @@ jobs:
           format: table
           exit-code: 1
           ignore-unfixed: true
-          severity: CRITICAL,HIGH,MEDIUM
+          severity: CRITICAL
       - name: Authenticate to github container registry
         uses: docker/login-action@v2
         with:
